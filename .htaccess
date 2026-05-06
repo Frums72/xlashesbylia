@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# HTTPS Redirect (falls nicht bereits konfiguriert)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# PHP Einstellungen
+php_value upload_max_filesize 128M
+php_value post_max_size 128M
+php_value max_execution_time 300
+php_value memory_limit 256M
+
+# Fehlerbehandlung
+ErrorDocument 404 /dashboard.html
+
+# CORS Headers (falls benötigt)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>

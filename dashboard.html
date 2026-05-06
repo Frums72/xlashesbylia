@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <title>Dashboard - Lashes by Lia</title>
+</head>
+<body class="dashboard-body">
+<div class="page-noise"></div>
+<header class="dashboard-header">
+  <div class="container nav dashboard-nav">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.png" alt="Lashes by Lia Logo" class="brand-logo" />
+      <div class="brand-copy"><strong>Lashes by Lia</strong><span>Interner Bereich</span></div>
+    </a>
+    <div class="dashboard-top-actions hidden" id="headerAccountArea">
+      <a href="index.html" class="button secondary small-btn">Zurück zur Webseite</a>
+      <div class="header-notification-menu" id="headerNotificationMenu">
+        <button class="theme-icon-btn notification-trigger" id="notificationTrigger" type="button" aria-label="Mitteilungen öffnen" title="Mitteilungen öffnen">
+          <span aria-hidden="true">🔔</span>
+          <span class="notification-badge hidden" id="notificationBadge">0</span>
+        </button>
+        <div class="header-notification-dropdown" id="headerNotificationDropdown">
+          <div class="header-notification-head">
+            <strong>Mitteilungen</strong>
+            <span class="subtle" id="notificationSummary">Keine offenen Hinweise</span>
+          </div>
+          <div id="notificationList" class="header-notification-list"></div>
+        </div>
+      </div>
+      <div class="header-profile-menu" id="headerProfileMenu">
+        <button class="header-profile-trigger" id="headerProfileTrigger" type="button">
+          <span class="header-online-dot" aria-hidden="true"></span>
+          <img id="headerAvatar" alt="Profilbild" />
+          <span class="header-name-stack"><strong id="headerDisplayName">Konto</strong><span id="headerDisplayRole" class="role-badge role-admin">Admin</span></span>
+        </button>
+        <div class="header-profile-dropdown" id="headerProfileDropdown">
+          <div class="header-profile-summary">
+            <img id="headerAvatarLarge" alt="Profilbild" />
+            <div class="dropdown-name-stack">
+              <strong id="dropdownName">-</strong>
+              <span id="dropdownRole" class="role-badge role-admin">Admin</span>
+            </div>
+          </div>
+          <div class="dropdown-meta">
+            <span id="dropdownEmail">-</span>
+            <span id="dropdownPhone">-</span>
+          </div>
+          <button class="button secondary full-width" id="jumpToProfile" type="button">Kontodetails bearbeiten</button>
+        </div>
+      </div>
+      <button class="theme-icon-btn logout-icon-btn" id="logoutBtn" type="button" aria-label="Abmelden" title="Abmelden"><span aria-hidden="true">⎋</span></button>
+      <button class="theme-icon-btn" id="themeToggle" type="button" aria-label="Darkmode umschalten" title="Darkmode umschalten"><span class="theme-moon" aria-hidden="true">☾</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-shell">
+  <section class="login-section" id="loginSection">
+    <div class="login-grid login-stage">
+      <div class="login-panel card reveal-up is-visible">
+        <p class="eyebrow">Interner Bereich</p>
+        <div class="login-mode-switch" id="authModeSwitch">
+          <button type="button" class="auth-mode-chip is-active" id="authModeLogin">Anmelden</button>
+          <button type="button" class="auth-mode-chip" id="authModeRegister">Registrieren</button>
+        </div>
+        <h1>Schön, dich wiederzusehen</h1>
+        <p class="lead">Bitte melde dich mit deinen Zugangsdaten an.</p>
+        <form id="loginForm" class="login-form">
+          <label><span>E-Mail-Adresse</span><input type="email" id="loginEmail" required></label>
+          <label><span>Passwort</span><input type="password" id="loginPassword" required></label>
+          <label class="checkbox-row remember-row"><input type="checkbox" id="rememberLogin"><span>Anmeldedaten speichern</span></label>
+          <button class="button primary success-hover" type="submit">Anmelden</button>
+          <div class="login-loading" id="loginLoading"><span class="spinner spinner-lg"></span><div class="login-loading-copy"><strong>Sie werden angemeldet ...</strong><span>Bitte einen kleinen Moment Geduld.</span></div></div>
+          <div class="success-pill" id="loginSuccess"></div>
+          <p class="login-error" id="loginError" aria-live="polite"></p>
+          <div class="login-switch-row">
+            <button type="button" class="text-button" id="showForgot">Passwort vergessen?</button>
+          </div>
+        </form>
+        <div class="register-box hidden" id="registerBox">
+          <div class="register-box-head">
+            <div>
+              <strong>Neue Kundin registrieren</strong>
+              <p class="subtle">Der Admin prüft die Anmeldung zuerst und schaltet dein Konto danach frei.</p>
+            </div>
+            <button type="button" class="text-button" id="hideRegister">Schließen</button>
+          </div>
+          <form id="registerForm" class="simple-form register-form">
+            <div class="grid-two">
+              <label><span>Vorname</span><input type="text" id="registerFirstName" required></label>
+              <label><span>Nachname</span><input type="text" id="registerLastName" required></label>
+              <label><span>E-Mail-Adresse</span><input type="email" id="registerEmail" required></label>
+              <label><span>Passwort</span><input type="password" id="registerPassword" minlength="8" required></label>
+              <label><span>Telefonnummer</span><input type="text" id="registerPhone"></label>
+              <label><span>Geburtsdatum</span><input type="date" id="registerBirthdate"></label>
+              <label><span>Instagram oder WhatsApp</span><input type="text" id="registerContactHint" placeholder="@name oder Nummer"></label>
+            </div>
+            <label><span>Kurze Notiz</span><textarea id="registerNote" rows="3" placeholder="Optional: z. B. Wunschleistung oder wie du auf Lashes by Lia aufmerksam geworden bist"></textarea></label>
+            <div class="register-actions">
+              <button class="button primary" type="submit">Jetzt registrieren!</button>
+            </div>
+            <p class="form-note register-note" id="registerNoteMessage"></p>
+          </form>
+        </div>
+        
+      </div>
+      <div class="card login-visual reveal-up delay-1 is-visible">
+        <img src="assets/studio-wide.jpeg" alt="Studio von Lashes by Lia">
+      </div>
+    </div>
+    <div class="forgot-modal hidden" id="forgotBox">
+      <div class="card forgot-card">
+        <h2>Passwort vergessen?</h2>
+        <p>Gib deine E-Mail-Adresse ein. Wenn ein Konto existiert, wird ein sicherer Link zum Zurücksetzen verschickt. Im lokalen Testmodus wird stattdessen ein temporäres Passwort erzeugt.</p>
+        <label><span>E-Mail-Adresse</span><input type="email" id="forgotEmail"></label>
+        <button class="button primary" id="forgotSend">Link anfordern</button>
+        <p class="form-note" id="forgotNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-app hidden" id="dashboardApp">
+    <div class="dashboard-layout">
+      <aside class="dashboard-sidebar card">
+        <button class="side-tab active" data-tab="overview">Übersicht</button>
+        <button class="side-tab" data-tab="calendar">Kalender</button>
+        <button class="side-tab admin-only" data-tab="tasks">Aufgaben</button>
+        <button class="side-tab" data-tab="appointments">Termine</button>
+        <button class="side-tab admin-only" data-tab="customers">Kunden</button>
+        <button class="side-tab admin-only" data-tab="settings">Einstellungen</button>
+      </aside>
+
+      <div class="dashboard-content">
+        
+
+
+<section class="dash-tab active" id="tab-overview">
+  <div class="overview-hero">
+    <h2>Hey Julia!<br>Hier ist dein Überblick für den Tag.</h2>
+  </div>
+
+  <div class="overview-reminder hidden" id="overviewTasksReminder"></div>
+
+  <div class="overview-insights-grid">
+    <div class="card panel overview-insight-card" id="overviewNextAppointmentCard"></div>
+    <div class="card panel overview-insight-card admin-only" id="overviewProgressCard"></div>
+    <div class="card panel overview-insight-card admin-only" id="overviewOccasionCard"></div>
+  </div>
+
+  <div class="free-slots-bar card admin-only">
+    <div>
+      <strong>Freie Termine</strong>
+      <p class="subtle">Diese Leistungen sind aktuell für neue Termine auswählbar</p>
+    </div>
+    <div id="overviewFreeSlots" class="week-day-content"></div>
+    <div class="calendar-link-row">
+      <button type="button" class="button secondary small-btn" id="openFreeSlotsOverviewBtn" onclick="return window.openFreeSlotsOverviewV64 ? window.openFreeSlotsOverviewV64() : false;">Freie Termine öffnen</button>
+    </div>
+  </div>
+
+  <div class="cards two overview-main-layout admin-only">
+    <div class="card panel overview-click-card" id="todayOverviewCard">
+      <header><h2>Tagesübersicht</h2><p class="subtle">Schlicht und direkt – dein heutiger Ablauf auf einen Blick</p></header>
+      <div id="overviewTodaySummary" class="overview-today-block"></div>
+      <div id="overviewTodayTimeline" class="day-timeline"></div>
+      <div class="calendar-link-row">
+        <button type="button" class="button secondary small-btn" id="openTodayOverviewBtn" onclick="return window.openTodayOverviewV64 ? window.openTodayOverviewV64() : false;">Tagesübersicht öffnen</button>
+      </div>
+    </div>
+
+    <div class="overview-right-stack">
+    <div class="card panel overview-click-card" id="weekOverviewCard">
+      <header><h2>Wochenansicht</h2><p class="subtle">Mit direktem Sprung in den Kalender</p></header>
+      <div id="overviewWeekList" class="week-overview-list"></div>
+      <div class="calendar-link-row">
+        <button type="button" class="button secondary small-btn" id="openWeekOverviewBtn" onclick="return window.openWeekOverviewV64 ? window.openWeekOverviewV64() : false;">Wochenansicht öffnen</button>
+        <button type="button" class="theme-icon-btn overview-calendar-icon" id="jumpToCalendarFromWeek" aria-label="Kalender öffnen" title="Kalender öffnen" onclick="openTab('calendar'); return false;"><span aria-hidden="true"></span></button>
+      </div>
+    </div>
+    <div class="card panel overview-insight-card overview-quicknotes-panel" id="overviewQuickNotesCard"></div>
+    </div>
+  </div>
+
+  <section class="overview-spotlight hidden" id="overviewSpotlight" aria-live="polite">
+    <div class="card overview-spotlight-card">
+      <div class="overview-spotlight-shell">
+        <div class="overview-spotlight-head">
+          <div>
+            <span class="overview-spotlight-kicker" id="overviewSpotlightKicker">Heute im Fokus</span>
+            <h3 id="overviewSpotlightTitle">Tagesübersicht</h3>
+            <p class="subtle" id="overviewSpotlightSubline"></p>
+          </div>
+          <div class="overview-spotlight-actions">
+            <button type="button" class="button secondary small-btn" id="overviewSpotlightCalendar">Zum Kalender</button>
+            <button type="button" class="quick-user-close" id="overviewSpotlightClose">×</button>
+          </div>
+        </div>
+        <div id="overviewSpotlightContent" class="overview-spotlight-content"></div>
+      </div>
+    </div>
+</section>
+
+
+</section>
+
+
+<section class="dash-tab" id="tab-calendar">
+          <div class="cards calendar-layout">
+            <div class="card calendar-card">
+              <div class="calendar-head">
+                <button class="text-button" id="prevMonth">←</button>
+                <h2 id="calendarTitle"></h2>
+                <button class="text-button" id="nextMonth">→</button>
+              </div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+              <div class="calendar-expand-row">
+                <button type="button" class="button secondary small-btn hidden" id="calendarExpandToggle">Mehr anzeigen</button>
+              </div>
+            </div>
+            <div class="card">
+              <header class="status-card-head">
+                <div>
+                  <h2>Kalender</h2>
+                </div>
+                </header>
+              <div id="calendarDaySummary" class="card panel calendar-day-summary"></div>
+              <div id="calendarDayActions" class="card panel calendar-day-actions"></div>
+              <form id="appointmentForm" class="simple-form hidden" aria-hidden="true">
+                <div class="grid-two">
+                  <label class="admin-only"><span>Kundin</span><select id="appointmentCustomer"></select></label>
+                  <label><span>Leistung</span><select id="appointmentService" required></select></label>
+                  <label><span>Datum</span><input type="date" id="appointmentDate" required min="" />
+                  <label><span>Uhrzeit</span><input type="time" id="appointmentTime" list="appointmentTimeSuggestions" required><datalist id="appointmentTimeSuggestions"></datalist></label>
+                </div>
+                <label><span>Notiz</span><textarea id="appointmentNote" rows="3"></textarea></label>
+                <div class="form-actions">
+                  <button class="button primary" type="submit" id="appointmentSubmitBtn">Termin speichern</button>
+                  <input type="hidden" id="appointmentEditId">
+                </div>
+              </form>
+              <div id="calendarAllList" class="stack-list"></div>
+            </div>
+          </div>
+        </section>
+
+        
+
+
+
+
+<section class="dash-tab" id="tab-tasks">
+  <div class="metric-grid" id="tasksMetricGrid"></div>
+
+  <div class="tasks-layout-grid">
+    <div class="tasks-side-stack">
+      <div class="card panel">
+        <header><h2>Aufgaben</h2><p class="subtle">Offene Anfragen und fehlende Unterlagen auf einen Blick</p></header>
+        <div class="task-search-row">
+          <label class="icon-search-field"><span>⌕</span><input type="text" id="taskCustomerSearch" placeholder="Kundin suchen"></label>
+        </div>
+        <div id="tasksAccordion" class="tasks-accordion"></div>
+      </div>
+
+      <div class="card panel">
+        <header class="rules-head">
+          <div>
+            <h2>Eigene Aufgaben</h2>
+          </div>
+          <button type="button" class="help-icon-btn" id="openRulesHelp" aria-label="Aufgaben-Regeln anzeigen">?</button>
+        </header>
+        <form id="customTaskForm" class="simple-form custom-task-form">
+          <div class="grid-two">
+            <label><span>Aufgabe</span><input type="text" id="customTaskTitle" placeholder="z. B. Kundin wegen Terminrückfrage anrufen" required></label>
+            <label><span>Erinnerung am</span><input type="datetime-local" id="customTaskReminderAt"></label>
+          </div>
+          <label><span>Notiz</span><textarea id="customTaskNote" rows="3" placeholder="Optionaler Hinweis, Ablauf oder Rückrufinfo"></textarea></label>
+          <div class="grid-two custom-task-reminder-grid">
+            <label class="checkbox-card"><input type="checkbox" id="customTaskReminderEmail"><span>Per E-Mail erinnern</span></label>
+            <label class="checkbox-card"><input type="checkbox" id="customTaskReminderPhone"><span>Per Nummer erinnern</span></label>
+          </div>
+          <div class="subtle small-note">Für Erinnerungen werden automatisch die hinterlegte E-Mail-Adresse und Telefonnummer aus dem Konto verwendet.</div>
+          <div class="form-actions">
+            <button class="button primary" type="submit">Aufgabe hinzufügen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card panel completed-tasks-panel">
+        <header><h2>Erledigte Aufgaben</h2><p class="subtle">Kompakter Verlauf mit Erstellerin, Erledigt-von und Zeitpunkten</p></header>
+        <div class="rule-card compact-rule-card completed-tasks-card">
+          <button type="button" class="task-toggle-btn completed-task-toggle" onclick="toggleTaskSection('completedTasksWrap')">
+          <span><strong>Erledigte Aufgaben</strong><span class="subtle task-owner-line"> · kompakter Verlauf</span></span>
+          <span class="task-count-badge" id="completedTasksBadge">0</span>
+          </button>
+          <div class="task-section-body hidden" id="completedTasksWrap">
+            <p class="subtle">Hier siehst du, wer welche Aufgabe erstellt, erledigt und zuletzt bearbeitet hat.</p>
+            <div id="completedTasksList" class="stack-list compact-task-history"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section class="dash-tab" id="tab-appointments">
+  <div id="appointmentsHub"></div>
+</section>
+
+<section class="dash-tab admin-only" id="tab-customers">
+  <div class="customer-admin-stack">
+    <div class="card panel">
+      <header><h2>Kundensuche</h2><p class="subtle">Bestehende Kundinnen schnell finden und nur von hier bearbeiten</p></header>
+      <div class="inline-actions" style="margin-bottom:12px;">
+        <button type="button" class="button secondary small-btn" id="openCustomerDirectory" onclick="return window.openCustomerDirectoryV64 ? window.openCustomerDirectoryV64(event) : false;">Kundenliste A–Z öffnen</button>
+      </div>
+      <label><span>Suche</span><input type="text" id="customerSearch" placeholder="Name, E-Mail oder Telefon"></label>
+<div id="customerList" class="stack-list customer-list-spaced"></div>
+      <button class="button primary" id="openCustomerCreateModal" type="button" onclick="document.getElementById('customerCreateModal').classList.add('active'); document.body.classList.add('modal-open');">+ Neue Kundin anlegen</button>
+    </div>
+
+    <!-- Customer Create Modal -->
+    <div class="overview-detail-modal" id="customerCreateModal">
+      <div class="overview-detail-backdrop" id="customerCreateBackdrop" onclick="document.getElementById('customerCreateModal').classList.remove('active'); document.body.classList.remove('modal-open');"></div>
+      <div class="overview-detail-panel card">
+        <button type="button" class="quick-user-close" id="customerCreateClose" onclick="document.getElementById('customerCreateModal').classList.remove('active'); document.body.classList.remove('modal-open');">×</button>
+        <header class="overview-detail-header">
+          <div class="overview-detail-icon" style="background: linear-gradient(135deg, #8B5E3C 0%, #D4A574 100%);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h2>Neue Kundin anlegen</h2>
+            <p class="subtle">Fülle die Daten aus um eine neue Kundin zu registrieren</p>
+          </div>
+        </header>
+        <form id="customerCreateForm" class="simple-form">
+        <div class="grid-three">
+          <label><span>Vorname</span><input type="text" id="createCustomerFirstName" required></label>
+          <label><span>Nachname</span><input type="text" id="createCustomerLastName" required></label>
+          <label><span>E-Mail</span><input type="email" id="createCustomerEmail" required></label>
+          <label><span>Passwort</span><input type="password" id="createCustomerPassword" minlength="8" required></label>
+          <label><span>Telefon</span><input type="text" id="createCustomerPhone"></label>
+          <label><span>WhatsApp</span><input type="text" id="createCustomerWhatsapp" placeholder="Optional"></label>
+          <label><span>Instagram</span><input type="text" id="createCustomerInstagram" placeholder="@kundin"></label>
+          <label><span>Geburtsdatum</span><input type="date" id="createCustomerBirthdate"></label>
+          <label class="span-2"><span>Anschrift</span><input type="text" id="createCustomerAddress" placeholder="Straße, Hausnummer, PLZ Ort"></label>
+        </div>
+        <label><span>Notiz</span><textarea id="createCustomerNote" rows="2" placeholder="z. B. Gerne Look zeigen, besondere Wünsche"></textarea></label>
+
+        <div class="document-check-grid create-docs-wrap">
+          <label class="checkbox-card adult-only create-doc-field"><input type="checkbox" id="createDocTreatmentContract"><span>Behandlungsvertrag vorhanden</span></label>
+          <label class="checkbox-card minor-only create-doc-field"><input type="checkbox" id="createDocMinorConsent"><span>Einverständniserklärung vorhanden</span></label>
+          <label class="checkbox-card minor-only create-doc-field"><input type="checkbox" id="createDocIdCopy"><span>Ausweiskopie vorhanden</span></label>
+        </div>
+
+        <div class="grid-three uploads-grid create-docs-wrap">
+          <label class="adult-only create-doc-field"><span>Behandlungsvertrag hochladen</span><input type="file" id="createUploadTreatmentContract" accept=".pdf,image/*"></label>
+          <label class="minor-only create-doc-field"><span>Einverständniserklärung hochladen</span><input type="file" id="createUploadMinorConsent" accept=".pdf,image/*"></label>
+          <label class="minor-only create-doc-field"><span>Ausweiskopie hochladen</span><input type="file" id="createUploadIdCopy" accept=".pdf,image/*"></label>
+        </div>
+
+        <div class="document-status-note" id="createCustomerDocHint"></div>
+        <button class="button primary" type="submit">Speichern</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section class="dash-tab admin-only" id="tab-settings">
+  <div class="cards two">
+    <div class="card panel">
+      <header><h2>Termine</h2><p class="subtle">Lege fest, wann du an den einzelnen Tagen Termine anbietest</p></header>
+      <div id="timeSettingsList" class="time-settings-list"></div>
+    </div>
+    <div class="card panel">
+      <header><h2>Zuletzt bearbeitet</h2><p class="subtle">Öffne den kompletten Verlauf mit Filtern</p></header>
+      <div id="reminderSettingsBox" class="reminder-settings-box"></div>
+      <div class="rule-card compact-rule-card settings-inline-card">
+        <strong>Zuletzt bearbeitet</strong>
+        <p class="subtle">Öffne den kompletten Verlauf mit Filtern</p>
+        <button type="button" class="button secondary" id="openHistoryLog" onclick="return window.openHistoryLogV64 ? window.openHistoryLogV64() : false;">Verlauf öffnen</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="dash-tab" id="tab-profile">
+          <div class="cards two">
+            <div class="card panel profile-card">
+              <div class="profile-avatar-large"><img id="profilePreviewLarge" alt="Profilbild"></div>
+              <div>
+                <h2>Mein Profil</h2>
+                <form id="profileForm" class="simple-form">
+                  <div class="grid-two">
+                    <label><span>Vorname</span><input type="text" id="profileFirstName"></label>
+                    <label><span>Nachname</span><input type="text" id="profileLastName"></label>
+                    <label><span>Telefon</span><input type="text" id="profilePhone"></label>
+                    <label><span>E-Mail</span><input type="email" id="profileEmail" disabled></label>
+                    <label><span>Geburtsdatum</span><input type="date" id="profileBirthdate"></label>
+                  </div>
+                  <label class="upload-avatar-label">Profilbild ändern<input type="file" id="avatarInput" accept="image/*"></label>
+                  <button class="button primary" type="submit" id="profileSaveBtn">Profil speichern</button>
+                </form>
+              </div>
+            </div>
+            <div class="card panel">
+              <h2>Kontodetails</h2>
+              <div class="stack-list compact-profile-list">
+                <div class="list-item"><strong>Angemeldet am</strong><div class="subtle" id="profileCreatedAt"></div></div>
+                <div class="list-item"><strong>Rolle</strong><div class="subtle" id="profileRole"></div></div>
+                <div class="list-item"><strong>Letzte Profiländerung</strong><div class="subtle" id="profileLastEdited"></div></div>
+                <div class="list-item"><strong>Zuletzt online am</strong><div class="subtle" id="profileLastOnline"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="dashboard-footer hidden" id="dashboardFooter">
+  <button type="button" class="footer-report-btn" id="openReportModal">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+    Fehler gefunden?
+  </button>
+</footer>
+
+<div class="download-modal hidden" id="reportModal" aria-hidden="true">
+  <div class="download-modal-backdrop" id="reportBackdrop"></div>
+  <div class="download-modal-card card" id="reportCardContent">
+    <div id="reportFormState">
+      <p class="eyebrow">Feedback</p>
+      <h2>Fehler gefunden?</h2>
+      <p>Ist dir etwas aufgefallen oder stimmt etwas nicht? Schreibe es mir hier.</p>
+      <form id="reportForm" class="simple-form">
+        <label><span>Deine Nachricht</span><textarea id="reportMessage" rows="5" placeholder="Beschreibe was nicht stimmt oder wo ein Fehler ist..." required></textarea></label>
+        <div class="download-actions">
+          <button class="button secondary" type="button" id="closeReportModal">Abbrechen</button>
+          <button class="button primary" type="submit">Absenden</button>
+        </div>
+      </form>
+    </div>
+    <div id="reportSuccessState" class="hidden">
+      <div class="success-icon-wrap">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h2>Danke für deine Meldung!</h2>
+      <p>Ich habe dein Feedback erhalten und werde mir das so schnell wie möglich anschauen.</p>
+      <button class="button primary" type="button" id="closeReportSuccess">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="online-list-toggle hidden" id="onlineToggle" onclick="toggleOnlinePanelV58()">Online</div>
+<div class="online-list-panel hidden" id="onlinePanel">
+  <strong>Online Status</strong>
+  <div class="online-tabs">
+    <button class="tab-btn active" data-tab="online" type="button">Online</button>
+    <button class="tab-btn" data-tab="offline" type="button">Offline</button>
+  </div>
+  <div id="onlineUsersOnline"></div>
+  <div id="onlineUsersOffline" class="hidden"></div>
+</div>
+
+<div class="overview-detail-modal" id="openingHoursModal">
+  <div class="overview-detail-backdrop" id="openingHoursBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="openingHoursClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #8B5E3C 0%, #D4A574 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <h2 id="openingHoursTitle">Tag bearbeiten</h2>
+        <p class="subtle">Lege fest, wann an diesem Tag Termine vergeben werden können.</p>
+      </div>
+    </header>
+    <form id="openingHoursForm" class="simple-form">
+      <input type="hidden" id="openingHoursDay">
+      <label class="checkbox-card"><input type="checkbox" id="openingHoursEnabled"><span>Termine an diesem Tag erlauben</span></label>
+      <div class="grid-two">
+        <label><span>Von</span><input type="time" id="openingHoursStart"></label>
+        <label><span>Bis</span><input type="time" id="openingHoursEnd"></label>
+      </div>
+      <div class="grid-two">
+        <label><span>Terminzeit in Minuten</span>
+          <select id="openingHoursSlotMinutes">
+            <option value="15">15 Minuten</option>
+            <option value="20">20 Minuten</option>
+            <option value="30">30 Minuten</option>
+            <option value="45">45 Minuten</option>
+            <option value="60">60 Minuten</option>
+            <option value="90">90 Minuten</option>
+            <option value="120">120 Minuten</option>
+          </select>
+        </label>
+        <label><span>Pufferzeit in Minuten</span>
+          <input type="number" id="openingHoursBufferMinutes" min="0" step="5" value="0" placeholder="0">
+        </label>
+      </div>
+      <div class="opening-hours-preview">
+        <strong>Vorschau freie Zeiten</strong>
+        <div id="openingHoursPreview" class="week-day-content"></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="button primary">Speichern</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="logoutConfirmModal">
+  <div class="overview-detail-backdrop" id="logoutConfirmBackdrop"></div>
+  <div class="overview-detail-panel card logout-confirm-panel">
+    <button type="button" class="quick-user-close" id="logoutConfirmClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </div>
+      <div>
+        <h2>Abmelden</h2>
+        <p class="subtle">Möchtest du dich wirklich vom Dashboard abmelden?</p>
+      </div>
+    </header>
+    <div class="logout-confirm-copy">
+      <div class="helper-badge">Sicherheitsabfrage</div>
+      <p>Deine aktuelle Sitzung wird beendet. Nicht gespeicherte Änderungen im laufenden Moment könnten verloren gehen.</p>
+    </div>
+    <div class="form-actions logout-confirm-actions">
+      <button type="button" class="button secondary" id="logoutConfirmCancel">Abbrechen</button>
+      <button type="button" class="button primary" id="logoutConfirmAccept">Jetzt abmelden</button>
+    </div>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="overviewDetailModal">
+  <div class="overview-detail-backdrop" id="overviewDetailBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="overviewDetailClose">×</button>
+    <header class="overview-detail-header">
+      <h2 id="overviewDetailTitle">Details</h2>
+      <p class="subtle" id="overviewDetailSubline"></p>
+    </header>
+    <div id="overviewDetailContent" class="stack-list"></div>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="rulesHelpModal">
+  <div class="overview-detail-backdrop" id="rulesHelpBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="rulesHelpClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div>
+        <h2>Aufgaben-Regeln</h2>
+        <p class="subtle">Wann welche Unterlagen und Bestätigungen erforderlich sind</p>
+      </div>
+    </header>
+    <div class="rules-content-grid">
+      <div class="rule-item">
+        <div class="rule-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <div class="rule-text">
+          <strong>Kein Geburtsdatum</strong>
+          <span>Es wird noch nichts als offen markiert.</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon age-under"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="rule-text">
+          <strong>Unter 18</strong>
+          <span>Benötigt: Einverständniserklärung + Ausweiskopie</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon age-over"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M9 7h6"/></svg></div>
+        <div class="rule-text">
+          <strong>Ab 18</strong>
+          <span>Benötigt: Behandlungsvertrag</span>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-icon schedule"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div class="rule-text">
+          <strong>Kundin ändert Termin</strong>
+          <span>Termin wird offen und muss vom Admin bestätigt werden</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="historyLogModal">
+  <div class="overview-detail-backdrop" id="historyLogBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="historyLogClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <h2>Zuletzt bearbeitet</h2>
+        <p class="subtle">Kompletter Verlauf aller Änderungen mit Filtermöglichkeiten</p>
+      </div>
+    </header>
+    <div class="history-filters">
+      <label><span>Suche</span><input type="text" id="historySearch" placeholder="Name, Termin, Dokument"></label>
+      <label><span>Ab Datum</span><input type="date" id="historyDateFrom"></label>
+      <label><span>Bis Datum</span><input type="date" id="historyDateTo"></label>
+    </div>
+    <div id="historyLogList" class="stack-list"></div>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="customerDirectoryModal">
+  <div class="overview-detail-backdrop" id="customerDirectoryBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="customerDirectoryClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #8B5E3C 0%, #D4A574 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div>
+        <h2>Kundenliste A–Z</h2>
+        <p class="subtle">Alle Kundinnen alphabetisch sortiert</p>
+      </div>
+    </header>
+    <div id="customerDirectoryList" class="stack-list"></div>
+  </div>
+</div>
+
+<div class="overview-detail-modal" id="customerEditModal">
+  <div class="overview-detail-backdrop" id="customerEditBackdrop"></div>
+  <div class="overview-detail-panel card">
+    <button type="button" class="quick-user-close" id="customerEditClose">×</button>
+    <header class="overview-detail-header">
+      <div class="overview-detail-icon" style="background: linear-gradient(135deg, #8B5E3C 0%, #D4A574 100%);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div>
+        <h2>Kundin bearbeiten</h2>
+        <p class="subtle">Bearbeiten erfolgt nur über Suche oder Kundenliste</p>
+      </div>
+    </header>
+    <form id="customerEditForm" class="simple-form">
+      <div class="grid-three">
+        <label><span>Vorname</span><input type="text" id="editCustomerFirstName" required></label>
+        <label><span>Nachname</span><input type="text" id="editCustomerLastName" required></label>
+        <label><span>E-Mail</span><input type="email" id="editCustomerEmail" required></label>
+        <label><span>Neues Passwort</span><input type="password" id="editCustomerPassword" minlength="8" placeholder="Leer lassen, um das Passwort unverändert zu lassen"></label>
+        <label><span>Telefon</span><input type="text" id="editCustomerPhone"></label>
+        <label><span>WhatsApp</span><input type="text" id="editCustomerWhatsapp" placeholder="Optional"></label>
+        <label><span>Instagram</span><input type="text" id="editCustomerInstagram" placeholder="@kundin"></label>
+        <label><span>Geburtsdatum</span><input type="date" id="editCustomerBirthdate"></label>
+        <label class="span-2"><span>Anschrift</span><input type="text" id="editCustomerAddress"></label>
+      </div>
+
+      <div class="document-check-grid edit-docs-wrap">
+        <label class="checkbox-card adult-only edit-doc-field"><input type="checkbox" id="editDocTreatmentContract"><span>Behandlungsvertrag vorhanden</span></label>
+        <label class="checkbox-card minor-only edit-doc-field"><input type="checkbox" id="editDocMinorConsent"><span>Einverständniserklärung vorhanden</span></label>
+        <label class="checkbox-card minor-only edit-doc-field"><input type="checkbox" id="editDocIdCopy"><span>Ausweiskopie vorhanden</span></label>
+      </div>
+
+      <div class="grid-three uploads-grid edit-docs-wrap">
+        <label class="adult-only edit-doc-field"><span>Behandlungsvertrag hochladen</span><input type="file" id="editUploadTreatmentContract" accept=".pdf,image/*"></label>
+        <label class="minor-only edit-doc-field"><span>Einverständniserklärung hochladen</span><input type="file" id="editUploadMinorConsent" accept=".pdf,image/*"></label>
+        <label class="minor-only edit-doc-field"><span>Ausweiskopie hochladen</span><input type="file" id="editUploadIdCopy" accept=".pdf,image/*"></label>
+      </div>
+
+      <div class="document-status-note" id="editCustomerDocHint"></div>
+      <div class="form-actions split-actions">
+        <button class="button danger secondary" type="button" id="deleteCustomerBtn">Kundin löschen</button>
+        <button class="button primary" type="submit">Änderungen speichern</button>
+      </div>
+      <input type="hidden" id="editCustomerId">
+    </form>
+  </div>
+</div>
+<script src="dashboard.js"></script>
+<script src="dashboard-finalize.js"></script>
+<script src="dashboard-polish.js"></script>
+<script src="dashboard-free-slots.js"></script>
+<script>
+(function(){
+  function initReportSystem(){
+    var reportBtn = document.getElementById('openReportModal');
+    var reportModal = document.getElementById('reportModal');
+    var reportForm = document.getElementById('reportForm');
+    var closeBtn = document.getElementById('closeReportModal');
+    var backdrop = document.getElementById('reportBackdrop');
+    
+    if(!reportBtn) return;
+    
+    function openReportModal(){
+      if(!reportModal) return;
+      reportModal.classList.remove('hidden');
+      reportModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+    }
+    
+    function closeReportModal(){
+      if(!reportModal) return;
+      reportModal.classList.add('hidden');
+      reportModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+    }
+    
+    reportBtn.addEventListener('click', openReportModal);
+    closeBtn?.addEventListener('click', closeReportModal);
+    backdrop?.addEventListener('click', closeReportModal);
+    
+    reportForm?.addEventListener('submit', function(e){
+      e.preventDefault();
+      var message = document.getElementById('reportMessage')?.value?.trim();
+      if(!message) return;
+      
+      var reports = JSON.parse(localStorage.getItem('lia_reports') || '[]');
+      var userName = (typeof currentUser !== 'undefined' && currentUser?.name) ? currentUser.name : 'Unbekannt';
+      var isAdmin = (typeof currentUser !== 'undefined' && currentUser?.role === 'admin');
+      reports.unshift({
+        id: 'r' + Date.now(),
+        message: message,
+        from: userName + (isAdmin ? ' (Admin)' : ''),
+        date: new Date().toISOString(),
+        status: 'neu'
+      });
+      localStorage.setItem('lia_reports', JSON.stringify(reports.slice(0, 100)));
+      
+      document.getElementById('reportFormState').classList.add('hidden');
+      document.getElementById('reportSuccessState').classList.remove('hidden');
+      
+      if(typeof window.renderReportsSettingsBox === 'function'){
+        window.renderReportsSettingsBox();
+      }
+      reportForm.reset();
+    });
+    
+    document.getElementById('closeReportSuccess')?.addEventListener('click', closeReportModal);
+  }
+  
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initReportSystem);
+  } else {
+    initReportSystem();
+  }
+  
+  function closeReportModal(){
+    if(!reportModal) return;
+    reportModal.classList.add('hidden');
+    reportModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    setTimeout(function(){
+      document.getElementById('reportFormState').classList.remove('hidden');
+      document.getElementById('reportSuccessState').classList.add('hidden');
+      reportForm?.reset();
+    }, 300);
+  }
+})();
+</script>
+<style>
+.dashboard-footer{
+  background:rgba(248,240,233,.85);
+  backdrop-filter:blur(8px);
+  border-top:1px solid rgba(35,31,28,.06);
+  padding:16px 24px;
+  display:flex;
+  justify-content:center;
+}
+.footer-report-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  border-radius:999px;
+  border:1px solid rgba(35,31,28,.12);
+  background:rgba(255,255,255,.7);
+  color:var(--text);
+  font-weight:600;
+  font-size:.88rem;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.footer-report-btn:hover{
+  background:var(--text);
+  color:#fff;
+  border-color:var(--text);
+}
+.footer-report-btn svg{
+  flex-shrink:0;
+}
+#reportSuccessState{
+  text-align:center;
+  padding:20px 0;
+}
+.success-icon-wrap{
+  margin-bottom:20px;
+  animation:successPop .4s ease;
+}
+@keyframes successPop{
+  0%{transform:scale(0);opacity:0}
+  50%{transform:scale(1.1)}
+  100%{transform:scale(1);opacity:1}
+}
+#reportSuccessState h2{
+  margin-bottom:12px;
+  color:#16a34a;
+}
+#reportSuccessState p{
+  color:var(--muted);
+  margin-bottom:24px;
+}
+#reportSuccessState .button{
+  min-width:160px;
+}
+</style>
+</body>
+</html>
