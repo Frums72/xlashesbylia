@@ -163,6 +163,25 @@ async function initDatabase() {
       `);
     }
 
+    // Create info@ admin user if not exists
+    const infoAdminExists = await client.query(
+      "SELECT id FROM users WHERE email = 'info@lashes-by-lia.de'"
+    );
+
+    if (infoAdminExists.rows.length === 0) {
+      await client.query(`
+        INSERT INTO users (email, password_hash, role, first_name, last_name, name, approval_status, approved_at, approved_by)
+        VALUES ('info@lashes-by-lia.de', $1, 'admin', 'Julia', 'Edmaier', 'Julia Edmaier', 'approved', CURRENT_TIMESTAMP, 'System')
+      `, [hashedPassword]);
+      console.log('Admin user created: info@lashes-by-lia.de');
+    } else {
+      // Ensure existing info@ admin has correct role and approved status
+      await client.query(`
+        UPDATE users SET role = 'admin', approval_status = 'approved', approved_at = COALESCE(approved_at, CURRENT_TIMESTAMP), approved_by = COALESCE(approved_by, 'System')
+        WHERE email = 'info@lashes-by-lia.de'
+      `);
+    }
+
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error);
