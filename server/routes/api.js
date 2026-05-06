@@ -184,13 +184,17 @@ router.get('/appointments', async (req, res) => {
 // Create appointment
 router.post('/appointments', async (req, res) => {
   try {
-    const { customerId, service, date, time, endTime, note, status } = req.body;
+    // Accept both camelCase (frontend) and snake_case field names
+    const customerId = req.body.customerId ?? req.body.customer_id;
+    const endTime = req.body.endTime ?? req.body.end_time;
+    const needsReconfirm = req.body.needsReconfirm ?? req.body.needs_reconfirm ?? false;
+    const { service, date, time, note, status } = req.body;
     
     const result = await pool.query(`
       INSERT INTO appointments (customer_id, user_id, service, date, time, end_time, note, status, needs_reconfirm, updated_by, updated_by_role)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
-    `, [customerId, req.session.userId, service, date, time, endTime, note, status || 'open', true, req.session.userName, req.session.role]);
+    `, [customerId, req.session.userId, service, date, time, endTime, note, status || 'open', needsReconfirm, req.session.userName, req.session.role]);
 
     res.json(result.rows[0]);
   } catch (error) {
@@ -203,7 +207,10 @@ router.post('/appointments', async (req, res) => {
 router.put('/appointments/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { service, date, time, endTime, note, status, needsReconfirm } = req.body;
+    // Accept both camelCase (frontend) and snake_case field names
+    const endTime = req.body.endTime ?? req.body.end_time;
+    const needsReconfirm = req.body.needsReconfirm ?? req.body.needs_reconfirm ?? false;
+    const { service, date, time, note, status } = req.body;
     
     const result = await pool.query(`
       UPDATE appointments 

@@ -3,6 +3,7 @@ const STORAGE_KEY = 'lia-dashboard-demo-v61';
 const REMEMBER_KEY = 'lia-dashboard-remember-v60';
 const API_URL = '/api';
 const NOTIFICATION_SEEN_KEY = 'lia-dashboard-notifications-v1';
+const LAST_TAB_KEY = 'lia-dashboard-last-tab-v1';
 
 // Global auth token - stored after login
 let AUTH_TOKEN = null;
@@ -1297,11 +1298,13 @@ function showDashboard(){
   syncRoleVisibility();
   bindThemeAndOnlineV61();
   renderAll();
-  openTab('overview');
+  // Restore the last opened tab, falling back to 'overview'
+  const lastTab = (()=>{ try{ return localStorage.getItem(LAST_TAB_KEY) || 'overview'; }catch{ return 'overview'; } })();
+  openTab(lastTab);
   startDashboardLiveRefresh();
   requestAnimationFrame(()=>{
     if(typeof closeOverviewSpotlightV65 === 'function') closeOverviewSpotlightV65();
-    openTab('overview');
+    openTab(lastTab);
   });
 }
 
@@ -1463,6 +1466,8 @@ function openTab(tab){
   if(currentUser?.role !== 'admin' && (tab === 'customers' || tab === 'settings')){
     tab = 'overview';
   }
+  // Persist the last opened tab so it can be restored on next login
+  try{ localStorage.setItem(LAST_TAB_KEY, tab); }catch{}
   if(typeof closeOverviewSpotlightV65 === 'function') closeOverviewSpotlightV65();
   qsa('.side-tab').forEach(btn=> btn.classList.toggle('active', btn.dataset.tab===tab));
   qsa('.dash-tab').forEach(panel=>{
