@@ -436,20 +436,56 @@
         updatedAt: nowISO(),
         needsReconfirm: currentUser?.role === 'customer'
       };
-      if(editId){
-        const existing = state.appointments.find((entry)=>entry.id === editId);
-        if(existing){
-          Object.assign(existing, payload);
-          if(currentUser?.role === 'admin'){
-            existing.needsReconfirm = false;
+      const isDemoModeActive = typeof isDemoMode === 'function' ? isDemoMode() : false;
+      if(!isDemoModeActive){
+        // Persist directly to the database via the appointments API
+        const apiBase = typeof API_URL !== 'undefined' ? API_URL : '/api';
+        const apiCall = editId
+          ? fetch(`${apiBase}/appointments/${editId}`, {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/json'},
+              credentials: 'include',
+              body: JSON.stringify(payload)
+            })
+          : fetch(`${apiBase}/appointments`, {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              credentials: 'include',
+              body: JSON.stringify(payload)
+            });
+        apiCall.then(async (response) => {
+          if(response.ok){
+            // Reload appointments from API to get the server-assigned id
+            const listResponse = await fetch(`${apiBase}/appointments`, {credentials: 'include'});
+            if(listResponse.ok){
+              const apiAppointments = await listResponse.json();
+              state.appointments = apiAppointments || [];
+            }
+          } else {
+            console.error('API error saving appointment:', response.status, await response.text());
           }
-        }
+          if(typeof renderAll === 'function') renderAll();
+        }).catch((err) => {
+          console.error('API error saving appointment:', err);
+          if(typeof renderAll === 'function') renderAll();
+        });
       } else {
-        state.appointments.push({ id: `a${Date.now()}`, ...payload });
+        // Demo mode — update local state only
+        if(editId){
+          const existing = state.appointments.find((entry)=>entry.id === editId);
+          if(existing){
+            Object.assign(existing, payload);
+            if(currentUser?.role === 'admin'){
+              existing.needsReconfirm = false;
+            }
+          }
+        } else {
+          state.appointments.push({ id: `a${Date.now()}`, ...payload });
+        }
+        if(typeof saveState === 'function') saveState();
+        if(typeof renderAll === 'function') renderAll();
       }
-      if(typeof saveState === 'function') saveState();
       closeOverviewModalV54();
-      if(typeof renderAll === 'function') renderAll();
       return false;
     };
   }
