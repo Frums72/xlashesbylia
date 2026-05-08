@@ -525,6 +525,27 @@ async function apiRequest(action, payload){
     };
   }
 }
+function formatTimeHHMM(value){
+  if(!value) return '';
+  // Convert HH:MM:SS to HH:MM
+  return String(value).slice(0, 5);
+}
+function normalizeAppointment(a){
+  if(!a) return a;
+  return {
+    id: String(a.id || ''),
+    customerId: String(a.customerId || a.customer_id || ''),
+    service: a.service || '',
+    date: a.date || '',
+    time: formatTimeHHMM(a.time || ''),
+    note: a.note || '',
+    status: a.status || 'open',
+    updatedBy: a.updatedBy || a.updated_by || '',
+    updatedByRole: a.updatedByRole || a.updated_by_role || '',
+    updatedAt: a.updatedAt || a.updated_at || '',
+    needsReconfirm: !!(a.needsReconfirm || a.needs_reconfirm)
+  };
+}
 async function loadState(){
   if(isDemoMode()){
     currentUser = null;
@@ -588,7 +609,7 @@ async function loadState(){
         if(apptRes.ok){
           const apiAppointments = await apptRes.json();
           if(Array.isArray(apiAppointments)){
-            state.appointments = apiAppointments;
+            state.appointments = apiAppointments.map(normalizeAppointment);
           }
         }
       }catch(e){
@@ -608,6 +629,8 @@ async function loadState(){
                   if(key === 'openingHours' && val && typeof val === 'object') state.settings.openingHours = val;
                   else if(key === 'services' && val && typeof val === 'object') state.settings.services = val;
                   else if(key === 'reminders' && val && typeof val === 'object') state.settings.reminders = {...state.settings.reminders, ...val};
+                  else if(key === 'overview' && val && typeof val === 'object') state.settings.overview = {...state.settings.overview, ...val};
+                  else if(key === 'quickNotes' && typeof val === 'string') state.settings.overview.quickNotes = val;
                   else if(state.settings[key] !== undefined) state.settings[key] = val;
                 }catch{}
               });
@@ -657,6 +680,7 @@ function saveState(){
 function showSaveFeedback(success, errorMsg){
   // Show a brief toast notification for save status
   let host = document.getElementById('saveFeedbackHost');
+
   if(!host){
     host = document.createElement('div');
     host.id = 'saveFeedbackHost';
@@ -677,6 +701,7 @@ function showSaveFeedback(success, errorMsg){
   host.appendChild(toast);
   setTimeout(()=>{ toast.style.opacity = '0'; setTimeout(()=> toast.remove(), 350); }, 1800);
 }
+
 function nowISO(){ return new Date().toISOString(); }
 function pad(n){ return String(n).padStart(2,'0'); }
 function parseDate(value){
@@ -1103,7 +1128,7 @@ function bindAuth(){
         if(apptRes.ok){
           const apiAppointments = await apptRes.json();
           if(Array.isArray(apiAppointments)){
-            state.appointments = apiAppointments;
+            state.appointments = apiAppointments.map(normalizeAppointment);
           }
         }
       }catch(e){
@@ -1145,7 +1170,7 @@ function bindAuth(){
         const apptRes = await fetch(`${API_URL}/appointments`, {credentials: 'include'});
         if(apptRes.ok){
           const appts = await apptRes.json();
-          state.appointments = appts || [];
+          state.appointments = (appts || []).map(normalizeAppointment);
         }
       }catch(e){ console.warn('Load appts after login:', e); }
       if(currentUser.role === 'admin'){
@@ -1553,8 +1578,7 @@ function updateHeaderProfile(){
     trigger.dataset.initials = initials(fullNameOf(currentUser));
     trigger.classList.toggle('has-avatar', !!avatar);
   }
-  const dot = document.querySelector('.header-online-dot');
-  if(dot) dot.classList.toggle('is-offline', !currentUser.online);
+  // Online dot removed
 
   const roleText = currentUser.role==='admin' ? 'Admin' : 'Kundin';
   const roleClass = currentUser.role==='admin' ? 'role-admin' : 'role-customer';
@@ -2035,7 +2059,7 @@ el('appointmentForm')?.addEventListener('submit', async (e)=>{
       // Reload appointments from API
       const response = await fetch(`${API_URL}/appointments`, {credentials: 'include'});
       const apiAppointments = await response.json();
-      state.appointments = apiAppointments || [];
+      state.appointments = (apiAppointments || []).map(normalizeAppointment);
     }catch(err){
       console.error('API error:', err);
       window.alert('Fehler beim Speichern in der Datenbank.');
