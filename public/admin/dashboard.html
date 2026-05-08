@@ -34,7 +34,6 @@
       </div>
       <div class="header-profile-menu" id="headerProfileMenu">
         <button class="header-profile-trigger" id="headerProfileTrigger" type="button">
-          <span class="header-online-dot" aria-hidden="true"></span>
           <img id="headerAvatar" alt="Profilbild" />
           <span class="header-name-stack"><strong id="headerDisplayName">Konto</strong><span id="headerDisplayRole" class="role-badge role-admin">Admin</span></span>
         </button>
@@ -271,16 +270,8 @@
           <button type="button" class="help-icon-btn" id="openRulesHelp" aria-label="Aufgaben-Regeln anzeigen">?</button>
         </header>
         <form id="customTaskForm" class="simple-form custom-task-form">
-          <div class="grid-two">
-            <label><span>Aufgabe</span><input type="text" id="customTaskTitle" placeholder="z. B. Kundin wegen Terminrückfrage anrufen" required></label>
-            <label><span>Erinnerung am</span><input type="datetime-local" id="customTaskReminderAt"></label>
-          </div>
+          <label><span>Aufgabe</span><input type="text" id="customTaskTitle" placeholder="z. B. Kundin wegen Terminrückfrage anrufen" required></label>
           <label><span>Notiz</span><textarea id="customTaskNote" rows="3" placeholder="Optionaler Hinweis, Ablauf oder Rückrufinfo"></textarea></label>
-          <div class="grid-two custom-task-reminder-grid">
-            <label class="checkbox-card"><input type="checkbox" id="customTaskReminderEmail"><span>Per E-Mail erinnern</span></label>
-            <label class="checkbox-card"><input type="checkbox" id="customTaskReminderPhone"><span>Per Nummer erinnern</span></label>
-          </div>
-          <div class="subtle small-note">Für Erinnerungen werden automatisch die hinterlegte E-Mail-Adresse und Telefonnummer aus dem Konto verwendet.</div>
           <div class="form-actions">
             <button class="button primary" type="submit">Aufgabe hinzufügen</button>
           </div>
@@ -379,7 +370,6 @@
     </div>
     <div class="card panel">
       <header><h2>Zuletzt bearbeitet</h2><p class="subtle">Öffne den kompletten Verlauf mit Filtern</p></header>
-      <div id="reminderSettingsBox" class="reminder-settings-box"></div>
       <div class="rule-card compact-rule-card settings-inline-card">
         <strong>Zuletzt bearbeitet</strong>
         <p class="subtle">Öffne den kompletten Verlauf mit Filtern</p>

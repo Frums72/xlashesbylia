@@ -334,9 +334,9 @@
         <div class="overview-day-sheet-head">
           <div>
             <span class="helper-badge">${appointment ? 'Termin bearbeiten' : 'Neuer Termin'}</span>
-            <strong>${appointment ? 'Passe diesen Termin direkt im Detail an.' : 'Vergib jetzt einen festen Termin.'}</strong>
+            <strong>${appointment ? `${displayName(appointment.customerId)} · ${appointment.service}` : 'Vergib jetzt einen festen Termin.'}</strong>
           </div>
-          <span class="subtle">${appointment ? 'Alle Änderungen werden sofort im Kalender und in der Übersicht übernommen.' : 'Lege Kundin, Leistung, Datum und Uhrzeit in einem Schritt fest.'}</span>
+          <span class="subtle">${appointment ? `${formatDateOnly(appointment.date)} · ${appointment.time} · Alle Änderungen werden sofort übernommen.` : 'Lege Kundin, Leistung, Datum und Uhrzeit in einem Schritt fest.'}</span>
         </div>
         <div class="overview-day-card-pro">
           <div class="grid-two">
@@ -459,7 +459,7 @@
             const listResponse = await fetch(`${apiBase}/appointments`, {credentials: 'include'});
             if(listResponse.ok){
               const apiAppointments = await listResponse.json();
-              state.appointments = apiAppointments || [];
+              state.appointments = (apiAppointments || []).map(a => typeof normalizeAppointment === 'function' ? normalizeAppointment(a) : a);
             }
           } else {
             console.error('API error saving appointment:', response.status, await response.text());
@@ -1735,16 +1735,8 @@
                 <button type="button" class="help-icon-btn" id="openRulesHelp" aria-label="Aufgaben-Regeln anzeigen">?</button>
               </header>
               <form id="customTaskForm" class="simple-form custom-task-form">
-                <div class="grid-two">
-                  <label><span>Aufgabe</span><input type="text" id="customTaskTitle" placeholder="z. B. Kundin wegen Terminrückfrage anrufen" required></label>
-                  <label><span>Erinnerung am</span><input type="datetime-local" id="customTaskReminderAt"></label>
-                </div>
+                <label><span>Aufgabe</span><input type="text" id="customTaskTitle" placeholder="z. B. Kundin wegen Terminrückfrage anrufen" required></label>
                 <label><span>Notiz</span><textarea id="customTaskNote" rows="3" placeholder="Optionaler Hinweis, Ablauf oder Rückrufinfo"></textarea></label>
-                <div class="grid-two custom-task-reminder-grid">
-                  <label class="checkbox-card"><input type="checkbox" id="customTaskReminderEmail"><span>Per E-Mail erinnern</span></label>
-                  <label class="checkbox-card"><input type="checkbox" id="customTaskReminderPhone"><span>Per Nummer erinnern</span></label>
-                </div>
-                <div class="subtle small-note">Für Erinnerungen werden automatisch die hinterlegte E-Mail-Adresse und Telefonnummer aus dem Konto verwendet.</div>
                 <div class="form-actions" style="margin-top:16px;display:flex !important;">
                   <button class="button primary" type="submit" style="display:inline-flex !important;visibility:visible !important;opacity:1 !important;width:100% !important;justify-content:center !important;">Aufgabe hinzufügen</button>
                 </div>
@@ -1779,7 +1771,6 @@
           </div>
           <div class="card panel">
             <header><h2>Zuletzt bearbeitet</h2><p class="subtle">Öffne den kompletten Verlauf mit Filtern</p></header>
-            <div id="reminderSettingsBox" class="reminder-settings-box"></div>
             <div class="rule-card compact-rule-card settings-inline-card">
               <strong>Zuletzt bearbeitet</strong>
               <button type="button" class="button secondary" id="openHistoryLog" onclick="return window.__liaOpenHistoryDirect ? window.__liaOpenHistoryDirect(event) : false;">Verlauf öffnen</button>
@@ -1830,9 +1821,8 @@
     const settingsTab = document.getElementById('tab-settings');
     if(!settingsTab) return;
     const timeSettingsList = document.getElementById('timeSettingsList');
-    const reminderSettingsBox = document.getElementById('reminderSettingsBox');
     const historyButton = document.getElementById('openHistoryLog');
-    if(!timeSettingsList || !reminderSettingsBox || !historyButton) return;
+    if(!timeSettingsList || !historyButton) return;
     if(settingsTab.dataset.settingsNormalized === 'true') return;
 
     const layout = document.createElement('div');
@@ -1846,11 +1836,6 @@
     const sideStack = document.createElement('div');
     sideStack.className = 'settings-side-stack';
 
-    const reminderCard = document.createElement('div');
-    reminderCard.className = 'card panel';
-    reminderCard.innerHTML = '<header><h2>Erinnerungen</h2><p class="subtle">Text, Versandzeit und Kanäle für deine Erinnerungen</p></header>';
-    reminderCard.appendChild(reminderSettingsBox);
-
     const historyCard = document.createElement('div');
     historyCard.className = 'card panel';
     historyCard.innerHTML = '<header><h2>Zuletzt bearbeitet</h2><p class="subtle">Öffne den kompletten Verlauf mit Filtern</p></header>';
@@ -1858,10 +1843,8 @@
     historyWrap.className = 'rule-card compact-rule-card settings-inline-card';
     historyWrap.appendChild(historyButton);
     historyCard.appendChild(historyWrap);
-
-    sideStack.appendChild(reminderCard);
     sideStack.appendChild(historyCard);
-    
+
     const servicesCard = document.createElement('div');
     servicesCard.className = 'card panel';
     servicesCard.innerHTML = `
@@ -1869,7 +1852,7 @@
       <div id="servicesSettingsBox" class="services-settings-box"></div>
       <button type="button" class="settings-action-btn" id="openServicesSettingsSheet">Leistungen bearbeiten</button>
     `;
-    
+
     const reportsCard = document.createElement('div');
     reportsCard.className = 'card panel';
     reportsCard.innerHTML = `
@@ -1877,7 +1860,7 @@
       <div id="reportsSettingsBox" class="reports-settings-box"></div>
       <button type="button" class="settings-action-btn" id="openReportsOverview">Reports anzeigen</button>
     `;
-    
+
     sideStack.appendChild(servicesCard);
     sideStack.appendChild(reportsCard);
 
@@ -1887,25 +1870,25 @@
     settingsTab.innerHTML = '';
     settingsTab.appendChild(layout);
     settingsTab.dataset.settingsNormalized = 'true';
-    
+
     document.getElementById('openServicesSettingsSheet')?.addEventListener('click', (event)=>{
       event.preventDefault();
       event.stopPropagation();
       finalOpenServicesSettingsSheet();
     });
-    
     document.getElementById('openReportsOverview')?.addEventListener('click', (event)=>{
       event.preventDefault();
       event.stopPropagation();
       finalOpenReportsOverview();
     });
   }
-  
+
   function renderReportsSettingsBox(){
     const box = document.getElementById('reportsSettingsBox');
     if(!box) return;
     const reports = JSON.parse(localStorage.getItem('lia_reports') || '[]');
     const newCount = reports.filter(r => r.status === 'neu').length;
+
     box.innerHTML = `
       <div class="reports-preview-row">
         <div class="reports-preview-stat ${newCount > 0 ? 'has-new' : ''}">
@@ -1919,7 +1902,6 @@
       </div>
     `;
   }
-  
   function finalOpenReportsOverview(){
     const reports = JSON.parse(localStorage.getItem('lia_reports') || '[]');
     document.body.classList.add('modal-open');
@@ -1948,6 +1930,8 @@
       </div>
     `, { resetHistory:true });
     bindModalClose('overviewDetailModal', 'overviewDetailClose', 'overviewDetailBackdrop');
+
+
     
     document.querySelectorAll('.report-done-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2068,8 +2052,6 @@
             if(!title){
               return;
             }
-          const reminderEmail = currentUser.email || '';
-          const reminderPhone = currentUser.phone || '';
           const newTask = {
             id: `task-${Date.now()}`,
             title,
@@ -2081,13 +2063,8 @@
             completedAt: '',
             completedById: '',
             completedByName: '',
-            reminderAt: document.getElementById('customTaskReminderAt')?.value || '',
-            reminder: {
-              emailEnabled: !!document.getElementById('customTaskReminderEmail')?.checked,
-              email: reminderEmail,
-              phoneEnabled: !!document.getElementById('customTaskReminderPhone')?.checked,
-              phone: reminderPhone
-            }
+            reminderAt: '',
+            reminder: {}
           };
           state.customTasks.push(newTask);
           // Save to API if not in demo mode
@@ -2099,8 +2076,8 @@
               body: JSON.stringify({
                 title: newTask.title,
                 note: newTask.note,
-                reminderAt: newTask.reminderAt || null,
-                reminder: newTask.reminder
+                reminderAt: null,
+                reminder: {}
               })
             }).catch(err => console.error('API error creating task:', err));
           } else if(typeof saveState === 'function'){
@@ -2115,6 +2092,7 @@
 
   function normalizeTasksCards(){
     const ownPanel = document.querySelector('#tab-tasks .card.panel:has(#customTaskForm)');
+
     const completedPanel = document.querySelector('#tab-tasks .completed-tasks-panel');
     const form = document.getElementById('customTaskForm');
     if(form) {
@@ -2479,6 +2457,14 @@
       saveBtn.onclick = ()=>{
         ensureOverviewSettings();
         state.settings.overview.quickNotes = noteField.value.trim();
+        // Persist quickNotes directly to the database
+        const apiBase = typeof API_URL !== 'undefined' ? API_URL : '/api';
+        fetch(`${apiBase}/settings`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          credentials: 'include',
+          body: JSON.stringify({ quickNotes: state.settings.overview.quickNotes, overview: state.settings.overview })
+        }).catch(err => console.warn('Quick notes save error:', err));
         if(typeof saveState === 'function') saveState();
         if(statusField) statusField.textContent = 'Gespeichert';
         setTimeout(()=>{
@@ -2486,6 +2472,7 @@
         }, 1800);
       };
     }
+
   }
 
   function __liaRenderOverviewV70(){
