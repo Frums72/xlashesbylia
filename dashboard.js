@@ -640,6 +640,27 @@ async function loadState(){
           console.warn('Could not load settings from API:', e);
         }
       }
+      // Load saved state blob (customTasks, etc.) from user dashboard_state
+      try{
+        const savedStateRes = await fetch(`${API_URL}/user-state`, {credentials: 'include'});
+        if(savedStateRes.ok){
+          const savedState = await savedStateRes.json();
+          if(savedState && typeof savedState === 'object'){
+            // Merge saved customTasks
+            if(Array.isArray(savedState.customTasks) && savedState.customTasks.length > 0){
+              state.customTasks = savedState.customTasks;
+            }
+            // Merge saved settings (lower priority than dedicated settings endpoint)
+            if(savedState.settings && typeof savedState.settings === 'object'){
+              if(!state.settings.openingHours || Object.keys(state.settings.openingHours).length === 0){
+                if(savedState.settings.openingHours) state.settings.openingHours = savedState.settings.openingHours;
+              }
+            }
+          }
+        }
+      }catch(e){
+        console.warn('Could not load saved state from API:', e);
+      }
       return state;
     }
   }catch(e){
@@ -657,22 +678,59 @@ function saveState(){
   if(!currentUser) return;
   const savedRole = currentUser.role;
   currentUser.role = savedRole;
+
+  // Build a lean state snapshot: only persist settings + appointments + customTasks
+  // (users/customers are managed via dedicated API endpoints)
+  let stateSnapshot;
+  try {
+    stateSnapshot = {
+      settings: state.settings || {},
+      appointments: state.appointments || [],
+      customTasks: state.customTasks || []
+    };
+    // Validate JSON serialization before sending
+    JSON.stringify(stateSnapshot);
+  } catch(e) {
+    console.error('State serialization error:', e);
+    showSaveFeedback(false, 'Fehler beim Serialisieren der Daten.');
+    return;
+  }
+
   // Save settings via dedicated endpoint (persists opening hours, services, reminders)
   const settingsPromise = fetch(`${API_URL}/settings`, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     credentials: 'include',
     body: JSON.stringify(state.settings || {})
-  }).catch(() => null);
-  // Also save state blob for user-level persistence
-  const statePromise = apiRequest('save-state', {state});
+  }).then(res => {
+    if(!res.ok) console.warn('Settings save returned', res.status);
+    return res;
+  }).catch(err => {
+    console.warn('Settings save failed:', err);
+    return null;
+  });
+
+  // Save state blob for user-level persistence
+  const statePromise = fetch(`${API_URL}/save-state`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
+    body: JSON.stringify({ state: stateSnapshot })
+  }).then(res => res.json().catch(() => ({ ok: false, message: 'Ungültige Serverantwort' })))
+    .catch(err => {
+      console.error('Save-state request failed:', err);
+      return { ok: false, message: 'Verbindungsfehler beim Speichern.' };
+    });
+
   Promise.all([settingsPromise, statePromise]).then(([, stateResult]) => {
     if(stateResult?.ok){
       showSaveFeedback(true);
     } else {
-      showSaveFeedback(false, stateResult?.message);
+      console.warn('Save-state failed:', stateResult);
+      showSaveFeedback(false, stateResult?.message || 'Fehler beim Speichern.');
     }
-  }).catch(() => {
+  }).catch(err => {
+    console.error('Save failed:', err);
     showSaveFeedback(false, 'Verbindungsfehler beim Speichern.');
   });
 }
