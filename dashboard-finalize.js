@@ -823,38 +823,40 @@
           <strong>Termine festlegen</strong>
           <span class="subtle">${activeDays} aktive Tage · Öffne die Terminvergabe in einem eigenen Bereich.</span>
         </div>
-        <button type="button" class="button secondary" id="openOpeningHoursOverview">Terminzeiten öffnen</button>
+        <button type="button" class="button secondary" id="openOpeningHoursOverview" onclick="return window.openOpeningHoursOverview ? window.openOpeningHoursOverview() : false;">Terminzeiten öffnen</button>
       </div>
     `;
-    const reminderLeadLabel = String(state.settings.reminders?.leadMinutes || 1440) === '60'
-      ? '1 Stunde vorher'
-      : String(state.settings.reminders?.leadMinutes || 1440) === '180'
-        ? '3 Stunden vorher'
-        : String(state.settings.reminders?.leadMinutes || 1440) === '720'
-          ? '12 Stunden vorher'
-          : String(state.settings.reminders?.leadMinutes || 1440) === '2880'
-            ? '2 Tage vorher'
-            : '1 Tag vorher';
-    const channels = state.settings.reminders?.channels || {};
-    const activeChannels = ['E-Mail', 'WhatsApp', 'Instagram'].filter((label, index)=>[channels.email, channels.whatsapp, channels.instagram][index]);
-    reminderBox.innerHTML = `
-      <div class="rule-card compact-rule-card settings-launch-card">
-        <div class="settings-launch-copy">
-          <strong>Erinnerungen</strong>
-          <span class="subtle">${reminderLeadLabel} · ${activeChannels.length ? activeChannels.join(', ') : 'Kein Kanal aktiv'}</span>
+    if(reminderBox){
+      const reminderLeadLabel = String(state.settings.reminders?.leadMinutes || 1440) === '60'
+        ? '1 Stunde vorher'
+        : String(state.settings.reminders?.leadMinutes || 1440) === '180'
+          ? '3 Stunden vorher'
+          : String(state.settings.reminders?.leadMinutes || 1440) === '720'
+            ? '12 Stunden vorher'
+            : String(state.settings.reminders?.leadMinutes || 1440) === '2880'
+              ? '2 Tage vorher'
+              : '1 Tag vorher';
+      const channels = state.settings.reminders?.channels || {};
+      const activeChannels = ['E-Mail', 'WhatsApp', 'Instagram'].filter((label, index)=>[channels.email, channels.whatsapp, channels.instagram][index]);
+      reminderBox.innerHTML = `
+        <div class="rule-card compact-rule-card settings-launch-card">
+          <div class="settings-launch-copy">
+            <strong>Erinnerungen</strong>
+            <span class="subtle">${reminderLeadLabel} · ${activeChannels.length ? activeChannels.join(', ') : 'Kein Kanal aktiv'}</span>
+          </div>
+          <button type="button" class="button secondary" id="openReminderSettingsSheet">Erinnerungen öffnen</button>
         </div>
-        <button type="button" class="button secondary" id="openReminderSettingsSheet">Erinnerungen öffnen</button>
-      </div>
-    `;
+      `;
+      document.getElementById('openReminderSettingsSheet')?.addEventListener('click', (event)=>{
+        event.preventDefault();
+        event.stopPropagation();
+        finalOpenReminderSettingsSheet({ missingEmail, missingWhatsapp, missingInstagram, hint: reminderHint });
+      });
+    }
     document.getElementById('openOpeningHoursOverview')?.addEventListener('click', (event)=>{
       event.preventDefault();
       event.stopPropagation();
       finalOpenOpeningHoursOverview();
-    });
-    document.getElementById('openReminderSettingsSheet')?.addEventListener('click', (event)=>{
-      event.preventDefault();
-      event.stopPropagation();
-      finalOpenReminderSettingsSheet({ missingEmail, missingWhatsapp, missingInstagram, hint: reminderHint });
     });
     // Render services and reports boxes
     window.setTimeout(()=>{

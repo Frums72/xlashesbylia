@@ -387,4 +387,27 @@ router.post('/save-state', requireAuth, async (req, res) => {
   }
 });
 
+// Get saved dashboard state for current user
+router.get('/user-state', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT dashboard_state FROM users WHERE id = $1',
+      [req.session.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.json({});
+    }
+
+    const raw = result.rows[0].dashboard_state;
+    if (!raw) return res.json({});
+
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return res.json(parsed || {});
+  } catch (error) {
+    console.error('Get user state error:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
