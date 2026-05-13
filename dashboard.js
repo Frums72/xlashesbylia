@@ -4449,3 +4449,248 @@ if(typeof window.openCustomerDirectoryV64 !== 'function'){
     return false;
   };
 }
+
+/* ============================================================
+   MOBILE NAVIGATION & TOUCH IMPROVEMENTS
+   ============================================================ */
+(function initMobileDashboard(){
+  'use strict';
+
+  // --- Debounce utility ---
+  function debounce(fn, delay){
+    let timer;
+    return function(){
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    };
+  }
+
+  // --- Cached DOM references ---
+  var sidebar = null;
+  var overlay = null;
+  var toggleBtn = null;
+  var isMobile = false;
+
+  function getElements(){
+    sidebar = document.getElementById('dashboardSidebar');
+    overlay = document.getElementById('sidebarOverlay');
+    toggleBtn = document.getElementById('mobileSidebarToggle');
+  }
+
+  function checkMobile(){
+    isMobile = window.innerWidth <= 768;
+  }
+
+  // --- Open sidebar ---
+  function openSidebar(){
+    try {
+      if(!sidebar || !overlay || !toggleBtn) return;
+      sidebar.classList.add('is-open');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      toggleBtn.innerHTML = '<span aria-hidden="true">✕</span>';
+      document.body.classList.add('modal-open');
+      // Trap focus inside sidebar
+      sidebar.focus();
+    } catch(err){
+      console.error('[Mobile Nav] openSidebar error:', err);
+    }
+  }
+
+  // --- Close sidebar ---
+  function closeSidebar(){
+    try {
+      if(!sidebar || !overlay || !toggleBtn) return;
+      sidebar.classList.remove('is-open');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      toggleBtn.innerHTML = '<span aria-hidden="true">☰</span>';
+      document.body.classList.remove('modal-open');
+    } catch(err){
+      console.error('[Mobile Nav] closeSidebar error:', err);
+    }
+  }
+
+  // --- Toggle sidebar ---
+  function toggleSidebar(){
+    if(!sidebar) return;
+    if(sidebar.classList.contains('is-open')){
+      closeSidebar();
+    } else {
+      openSidebar();
+    }
+  }
+
+  // --- Show/hide toggle button based on viewport ---
+  function syncToggleVisibility(){
+    try {
+      checkMobile();
+      if(!toggleBtn) return;
+      if(isMobile){
+        toggleBtn.classList.remove('hidden');
+      } else {
+        toggleBtn.classList.add('hidden');
+        closeSidebar(); // ensure sidebar is reset when going to desktop
+      }
+    } catch(err){
+      console.error('[Mobile Nav] syncToggleVisibility error:', err);
+    }
+  }
+
+  // --- Swipe detection for sidebar ---
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var swipeThreshold = 60;
+  var swipeEdgeZone = 30; // px from left edge to trigger open
+
+  function onTouchStart(e){
+    try {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    } catch(err){}
+  }
+
+  function onTouchEnd(e){
+    try {
+      if(!isMobile) return;
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      var dy = e.changedTouches[0].clientY - touchStartY;
+      // Only handle horizontal swipes (not vertical scrolls)
+      if(Math.abs(dy) > Math.abs(dx)) return;
+      if(dx > swipeThreshold && touchStartX < swipeEdgeZone){
+        // Swipe right from left edge → open sidebar
+        openSidebar();
+      } else if(dx < -swipeThreshold && sidebar && sidebar.classList.contains('is-open')){
+        // Swipe left → close sidebar
+        closeSidebar();
+      }
+    } catch(err){}
+  }
+
+  // --- Close sidebar when a tab is clicked (mobile) ---
+  function bindSideTabClose(){
+    try {
+      var tabs = document.querySelectorAll('.side-tab');
+      tabs.forEach(function(tab){
+        tab.addEventListener('click', function(){
+          if(isMobile) closeSidebar();
+        });
+      });
+    } catch(err){
+      console.error('[Mobile Nav] bindSideTabClose error:', err);
+    }
+  }
+
+  // --- Keyboard: close sidebar on Escape ---
+  function onKeyDown(e){
+    try {
+      if(e.key === 'Escape' && sidebar && sidebar.classList.contains('is-open')){
+        closeSidebar();
+        if(toggleBtn) toggleBtn.focus();
+      }
+    } catch(err){}
+  }
+
+  // --- Resize handler (debounced) ---
+  var onResize = debounce(function(){
+    syncToggleVisibility();
+  }, 150);
+
+  // --- Offline / online detection ---
+  function updateOnlineStatus(){
+    try {
+      var isOnline = navigator.onLine;
+      var existing = document.getElementById('offlineBanner');
+      if(!isOnline){
+        if(!existing){
+          var banner = document.createElement('div');
+          banner.id = 'offlineBanner';
+          banner.setAttribute('role', 'alert');
+          banner.setAttribute('aria-live', 'assertive');
+          banner.style.cssText = [
+            'position:fixed',
+            'top:0',
+            'left:0',
+            'right:0',
+            'z-index:9999',
+            'background:#c0392b',
+            'color:#fff',
+            'text-align:center',
+            'padding:10px 16px',
+            'font-size:.9rem',
+            'font-weight:700'
+          ].join(';');
+          banner.textContent = 'Keine Internetverbindung – Änderungen werden nicht gespeichert.';
+          document.body.prepend(banner);
+        }
+      } else {
+        if(existing) existing.remove();
+      }
+    } catch(err){
+      console.error('[Mobile Nav] updateOnlineStatus error:', err);
+    }
+  }
+
+  // --- Init ---
+  function init(){
+    try {
+      getElements();
+      checkMobile();
+
+      if(!toggleBtn){
+        console.warn('[Mobile Nav] mobileSidebarToggle not found');
+        return;
+      }
+
+      // Bind toggle button
+      toggleBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSidebar();
+      });
+
+      // Bind overlay click to close
+      if(overlay){
+        overlay.addEventListener('click', closeSidebar);
+      }
+
+      // Bind side tab clicks to close sidebar on mobile
+      bindSideTabClose();
+
+      // Keyboard support
+      document.addEventListener('keydown', onKeyDown);
+
+      // Touch swipe support
+      document.addEventListener('touchstart', onTouchStart, { passive: true });
+      document.addEventListener('touchend', onTouchEnd, { passive: true });
+
+      // Resize handler
+      window.addEventListener('resize', onResize);
+
+      // Initial visibility sync
+      syncToggleVisibility();
+
+      // Offline detection
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      updateOnlineStatus();
+
+    } catch(err){
+      console.error('[Mobile Nav] init error:', err);
+    }
+  }
+
+  // Run after DOM is ready
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Expose for external use
+  window.openMobileSidebar = openSidebar;
+  window.closeMobileSidebar = closeSidebar;
+
+})();

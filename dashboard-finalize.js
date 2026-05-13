@@ -2856,3 +2856,50 @@
   };
 })();
 
+/* ============================================================
+   MOBILE SIDEBAR SYNC — re-bind after dashboard app is shown
+   Ensures the toggle button is visible when the dashboard
+   section becomes active (after login).
+   ============================================================ */
+(function(){
+  'use strict';
+
+  function syncMobileSidebarAfterLogin(){
+    try {
+      var toggleBtn = document.getElementById('mobileSidebarToggle');
+      if(!toggleBtn) return;
+      var isMobile = window.innerWidth <= 768;
+      if(isMobile){
+        toggleBtn.classList.remove('hidden');
+      }
+    } catch(err){
+      console.error('[Finalize] syncMobileSidebarAfterLogin error:', err);
+    }
+  }
+
+  // Watch for the dashboardApp section becoming visible
+  // (it starts with class "hidden" and gets it removed on login)
+  var dashboardApp = document.getElementById('dashboardApp');
+  if(dashboardApp && typeof MutationObserver !== 'undefined'){
+    var observer = new MutationObserver(function(mutations){
+      mutations.forEach(function(mutation){
+        if(mutation.type === 'attributes' && mutation.attributeName === 'class'){
+          var isVisible = !dashboardApp.classList.contains('hidden');
+          if(isVisible){
+            syncMobileSidebarAfterLogin();
+            observer.disconnect();
+          }
+        }
+      });
+    });
+    observer.observe(dashboardApp, { attributes: true });
+  }
+
+  // Also run on load as a fallback
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', syncMobileSidebarAfterLogin);
+  } else {
+    syncMobileSidebarAfterLogin();
+  }
+})();
+

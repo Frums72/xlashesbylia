@@ -414,3 +414,107 @@
   }
   window.addEventListener('load', initPolish);
 })();
+
+/* ============================================================
+   PERFORMANCE & ACCESSIBILITY IMPROVEMENTS
+   ============================================================ */
+(function(){
+  'use strict';
+
+  // --- Add lazy loading to all images that don't have it ---
+  function addLazyLoading(){
+    try {
+      var images = document.querySelectorAll('img:not([loading])');
+      images.forEach(function(img){
+        // Don't lazy-load above-the-fold brand logo
+        if(!img.classList.contains('brand-logo')){
+          img.setAttribute('loading', 'lazy');
+        }
+        // Ensure alt text exists (accessibility)
+        if(!img.hasAttribute('alt')){
+          img.setAttribute('alt', '');
+        }
+      });
+    } catch(err){
+      console.error('[Polish] addLazyLoading error:', err);
+    }
+  }
+
+  // --- Add missing ARIA labels to icon buttons ---
+  function improveAriaLabels(){
+    try {
+      // Notification trigger
+      var notifBtn = document.getElementById('notificationTrigger');
+      if(notifBtn && !notifBtn.getAttribute('aria-label')){
+        notifBtn.setAttribute('aria-label', 'Mitteilungen öffnen');
+      }
+
+      // Theme toggle
+      var themeBtn = document.getElementById('themeToggle');
+      if(themeBtn && !themeBtn.getAttribute('aria-label')){
+        themeBtn.setAttribute('aria-label', 'Darkmode umschalten');
+      }
+
+      // Logout button
+      var logoutBtn = document.getElementById('logoutBtn');
+      if(logoutBtn && !logoutBtn.getAttribute('aria-label')){
+        logoutBtn.setAttribute('aria-label', 'Abmelden');
+      }
+
+      // Calendar navigation
+      var prevMonth = document.getElementById('prevMonth');
+      if(prevMonth && !prevMonth.getAttribute('aria-label')){
+        prevMonth.setAttribute('aria-label', 'Vorheriger Monat');
+      }
+      var nextMonth = document.getElementById('nextMonth');
+      if(nextMonth && !nextMonth.getAttribute('aria-label')){
+        nextMonth.setAttribute('aria-label', 'Nächster Monat');
+      }
+
+      // Close buttons (×)
+      var closeBtns = document.querySelectorAll('.quick-user-close:not([aria-label])');
+      closeBtns.forEach(function(btn){
+        btn.setAttribute('aria-label', 'Schließen');
+      });
+
+      // Search inputs
+      var searchInputs = document.querySelectorAll('input[type="text"][placeholder]:not([aria-label])');
+      searchInputs.forEach(function(input){
+        if(input.placeholder){
+          input.setAttribute('aria-label', input.placeholder);
+        }
+      });
+    } catch(err){
+      console.error('[Polish] improveAriaLabels error:', err);
+    }
+  }
+
+  // --- Prevent horizontal overflow on mobile ---
+  function preventHorizontalScroll(){
+    try {
+      if(window.innerWidth <= 768){
+        // Check for any element wider than viewport
+        var body = document.body;
+        if(body.scrollWidth > window.innerWidth){
+          body.style.overflowX = 'hidden';
+        }
+      }
+    } catch(err){}
+  }
+
+  // --- Run improvements ---
+  function runImprovements(){
+    addLazyLoading();
+    improveAriaLabels();
+    preventHorizontalScroll();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', runImprovements);
+  } else {
+    runImprovements();
+  }
+
+  // Re-run after dynamic content loads
+  window.addEventListener('load', runImprovements);
+})();

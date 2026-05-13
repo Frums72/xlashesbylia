@@ -6242,3 +6242,669 @@ body.role-admin-active div.admin-only{display:inherit !important}
     height: 160px !important;
   }
 }
+
+
+/* ============================================================
+   MOBILE-FIRST DASHBOARD OPTIMIZATION — COMPREHENSIVE UPDATE
+   Breakpoints: 320px | 480px | 768px | 1024px | 1280px
+   ============================================================ */
+
+/* --- Mobile Sidebar Toggle Button --- */
+.mobile-sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(35,31,28,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.95);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.mobile-sidebar-toggle:hover,
+.mobile-sidebar-toggle:focus-visible {
+  background: #fff;
+  border-color: rgba(183,143,133,.3);
+  outline: 2px solid rgba(183,143,133,.4);
+  outline-offset: 2px;
+}
+
+/* --- Sidebar Overlay (mobile) --- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17,14,12,.45);
+  backdrop-filter: blur(2px);
+  z-index: 149;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* --- Touch-friendly base improvements --- */
+button,
+[role="button"],
+.side-tab,
+.filter-chip,
+.week-chip,
+.auth-mode-chip,
+.text-button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ensure minimum 44px touch targets on all interactive elements */
+.side-tab,
+.button,
+.theme-icon-btn,
+.icon-btn,
+.filter-chip {
+  min-height: 44px;
+}
+
+/* --- Focus indicators for keyboard/accessibility --- */
+:focus-visible {
+  outline: 2px solid rgba(183,143,133,.7);
+  outline-offset: 2px;
+}
+.side-tab:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Responsive font scaling with clamp() --- */
+.overview-hero h2 {
+  font-size: clamp(1.6rem, 4vw, 3.2rem) !important;
+}
+.dash-tab .panel > header h2,
+.dash-tab .card > header h2 {
+  font-size: clamp(.78rem, 1.8vw, .92rem) !important;
+}
+
+/* --- Smooth scrolling for all scroll containers --- */
+.dashboard-content,
+.overview-detail-panel,
+.header-notification-list,
+.stack-list {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ============================================================
+   TABLET — 1024px and below
+   ============================================================ */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 220px 1fr;
+    gap: 16px;
+  }
+  .dashboard-sidebar {
+    top: 90px;
+  }
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(80px, 1fr));
+    gap: 8px;
+  }
+  .calendar-cell {
+    min-height: 80px;
+    padding: 8px 10px;
+  }
+  .tasks-layout-grid {
+    grid-template-columns: 1fr;
+  }
+  .overview-insights-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================================
+   MOBILE TABLET — 768px and below
+   Core dashboard mobile layout
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* Show mobile toggle, reorder header */
+  .mobile-sidebar-toggle {
+    display: inline-flex;
+    order: -1;
+  }
+
+  /* Header layout on mobile */
+  .dashboard-nav {
+    min-height: 60px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    padding: 8px 0;
+  }
+  .brand {
+    flex: 1;
+    min-width: 0;
+  }
+  .brand-copy span {
+    display: none;
+  }
+  .brand-copy strong {
+    font-size: .9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+  .dashboard-top-actions {
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  /* Hide "Zurück zur Webseite" on mobile to save space */
+  .dashboard-top-actions > a.button.secondary {
+    display: none;
+  }
+
+  /* Sticky header */
+  .dashboard-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  /* Dashboard shell padding */
+  .dashboard-shell {
+    padding: 16px 12px 100px;
+  }
+
+  /* Dashboard layout: single column, sidebar becomes slide-in drawer */
+  .dashboard-layout {
+    display: block;
+    position: relative;
+  }
+
+  /* Sidebar: hidden off-screen by default, slides in from left */
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 260px;
+    height: 100dvh;
+    height: 100vh;
+    z-index: 150;
+    border-radius: 0 24px 24px 0;
+    padding: 80px 14px 24px;
+    overflow-y: auto;
+    transition: left .28s cubic-bezier(.4,0,.2,1);
+    box-shadow: none;
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dashboard-sidebar.is-open {
+    left: 0;
+    box-shadow: 4px 0 40px rgba(17,14,12,.18);
+  }
+
+  /* Side tabs: full-width, larger touch targets */
+  .side-tab {
+    padding: 14px 16px;
+    font-size: .95rem;
+    border-radius: 14px;
+    min-height: 48px;
+    text-align: left;
+    width: 100%;
+  }
+
+  /* Dashboard content: full width */
+  .dashboard-content {
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Tabs */
+  .dash-tab {
+    padding: 12px 0 20px;
+  }
+
+  /* Cards: tighter on mobile */
+  .card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+  .card:hover {
+    transform: none; /* disable hover lift on touch */
+  }
+
+  /* Two/three column grids → single column */
+  .cards.two,
+  .cards.three,
+  .overview-main-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  /* Overview */
+  .overview-hero {
+    margin-bottom: 14px;
+  }
+  .overview-insights-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .overview-right-stack {
+    display: grid;
+    gap: 14px;
+  }
+  .free-slots-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Calendar layout */
+  .calendar-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .calendar-cell {
+    min-height: 60px;
+    padding: 6px 4px;
+    border-radius: 12px;
+  }
+  .calendar-cell .day {
+    font-size: .85rem;
+  }
+  .calendar-preview-item {
+    display: none; /* hide appointment previews on small calendar cells */
+  }
+  .calendar-cell.selected .calendar-preview-item {
+    display: grid; /* show on selected cell */
+  }
+  .calendar-label {
+    font-size: .7rem;
+    padding: 0 2px 8px;
+  }
+
+  /* Forms: full-width, larger inputs */
+  .grid-two,
+  .grid-three {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .span-2 {
+    grid-column: span 1 !important;
+  }
+  input,
+  textarea,
+  select {
+    min-height: 48px;
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 12px 14px;
+  }
+  textarea {
+    min-height: 80px;
+  }
+  .simple-form label {
+    margin-bottom: 10px;
+  }
+  .simple-form label span,
+  .login-form label span {
+    font-size: .88rem;
+    margin-bottom: 6px;
+  }
+
+  /* Buttons: full-width on mobile forms */
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .form-actions .button {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+  /* But keep inline action buttons (icon buttons) normal */
+  .calendar-actions-row .button,
+  .calendar-link-row .button,
+  .inline-actions .button,
+  .task-section-body .button,
+  .register-actions .button {
+    width: auto;
+  }
+
+  /* Login */
+  .login-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .login-visual {
+    display: none !important;
+  }
+  .login-panel {
+    min-height: auto;
+    padding: 24px 20px;
+  }
+  .login-section {
+    padding: 20px 0;
+  }
+
+  /* Modals: full-screen sheet on mobile */
+  .overview-detail-modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .overview-detail-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90dvh;
+    max-height: 90vh;
+    border-radius: 24px 24px 0 0 !important;
+    margin: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 16px 32px;
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+  }
+  .download-modal-card {
+    width: calc(100% - 24px);
+    max-width: 100%;
+    border-radius: 20px;
+  }
+
+  /* Tasks layout */
+  .tasks-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .tasks-side-stack {
+    gap: 14px;
+  }
+
+  /* Metric grid */
+  .metric-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  .metric-card {
+    padding: 14px 12px;
+  }
+
+  /* Document check grid */
+  .document-check-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Profile */
+  .profile-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .profile-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 18px;
+  }
+
+  /* Notification toast: full-width on mobile */
+  .notification-toast-host {
+    right: 12px;
+    left: 12px;
+    bottom: 80px;
+    width: auto;
+  }
+
+  /* Header dropdowns: bottom sheet on mobile */
+  .header-notification-dropdown,
+  .header-profile-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  /* Footer: safe area padding */
+  .dashboard-footer {
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  /* Week overview */
+  .week-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Stack list items */
+  .list-item {
+    padding: 12px 14px;
+  }
+  .appointment-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Settings */
+  .time-settings-list {
+    gap: 10px;
+  }
+
+  /* Customer admin */
+  .customer-admin-stack {
+    gap: 14px;
+  }
+
+  /* Spotlight */
+  .overview-spotlight-head {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .overview-spotlight-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ============================================================
+   SMALL PHONE — 480px and below
+   ============================================================ */
+@media (max-width: 480px) {
+  .dashboard-shell {
+    padding: 12px 10px 90px;
+  }
+  .card {
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+  .brand-copy {
+    display: none;
+  }
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+  }
+  .dashboard-nav {
+    min-height: 54px;
+  }
+
+  /* Calendar: 3 columns on small phones */
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    gap: 3px;
+  }
+  .calendar-cell {
+    min-height: 48px;
+    padding: 4px 3px;
+    border-radius: 10px;
+  }
+  .calendar-cell .day {
+    font-size: .78rem;
+  }
+  .calendar-label {
+    font-size: .65rem;
+  }
+
+  /* Metric grid: single column on very small screens */
+  .metric-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modals */
+  .overview-detail-panel {
+    padding: 16px 12px 28px;
+    padding-bottom: max(28px, env(safe-area-inset-bottom));
+  }
+
+  /* Buttons */
+  .button {
+    font-size: .9rem;
+    padding: 12px 18px;
+  }
+  .button.small-btn {
+    padding: 10px 14px;
+    font-size: .82rem;
+  }
+
+  /* Side tab font */
+  .side-tab {
+    font-size: .88rem;
+    padding: 12px 14px;
+  }
+
+  /* Overview hero */
+  .overview-hero h2 {
+    font-size: clamp(1.4rem, 6vw, 2rem) !important;
+  }
+
+  /* Header actions: tighter */
+  .dashboard-top-actions {
+    gap: 4px;
+  }
+  .theme-icon-btn {
+    width: 38px;
+    height: 38px;
+    font-size: .95rem;
+  }
+
+  /* Login */
+  .login-panel {
+    padding: 20px 16px;
+  }
+  .auth-mode-chip {
+    padding: 8px 14px;
+    font-size: .88rem;
+  }
+}
+
+/* ============================================================
+   VERY SMALL PHONE — 360px and below
+   ============================================================ */
+@media (max-width: 360px) {
+  .dashboard-shell {
+    padding: 10px 8px 88px;
+  }
+  .card {
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+  .side-tab {
+    font-size: .82rem;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  .calendar-cell {
+    min-height: 42px;
+    padding: 3px 2px;
+  }
+  .calendar-cell .day {
+    font-size: .72rem;
+  }
+  .calendar-label {
+    font-size: .6rem;
+  }
+  .button {
+    font-size: .85rem;
+    padding: 11px 14px;
+  }
+  .theme-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* ============================================================
+   SAFE AREA INSETS (iPhone notch / home indicator)
+   ============================================================ */
+@supports (padding: max(0px)) {
+  .dashboard-header {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+  .dashboard-sidebar {
+    padding-top: max(80px, calc(80px + env(safe-area-inset-top)));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .dashboard-footer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .notification-toast-host {
+    bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+  }
+}
+
+/* ============================================================
+   DARK MODE — mobile sidebar overlay
+   ============================================================ */
+.theme-dark .mobile-sidebar-toggle {
+  background: rgba(42,33,31,.95) !important;
+  border-color: rgba(255,255,255,.10) !important;
+  color: #f6efe9 !important;
+}
+.theme-dark .sidebar-overlay {
+  background: rgba(8,6,5,.6);
+}
+
+/* ============================================================
+   PRINT — hide navigation chrome
+   ============================================================ */
+@media print {
+  .dashboard-header,
+  .dashboard-sidebar,
+  .dashboard-footer,
+  .mobile-sidebar-toggle,
+  .sidebar-overlay {
+    display: none !important;
+  }
+  .dashboard-layout {
+    display: block !important;
+  }
+  .dashboard-content {
+    padding: 0 !important;
+  }
+}
