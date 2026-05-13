@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
@@ -14,9 +14,12 @@
 <header class="dashboard-header">
   <div class="container nav dashboard-nav">
     <a href="/" class="brand">
-      <img src="/assets/logo.png" alt="Lashes by Lia Logo" class="brand-logo" />
+      <img src="/assets/logo.png" alt="Lashes by Lia Logo" class="brand-logo" loading="lazy" />
       <div class="brand-copy"><strong>Lashes by Lia</strong><span>Interner Bereich</span></div>
     </a>
+    <button class="mobile-sidebar-toggle hidden" id="mobileSidebarToggle" type="button" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="dashboardSidebar">
+      <span aria-hidden="true">☰</span>
+    </button>
     <div class="dashboard-top-actions hidden" id="headerAccountArea">
       <a href="/" class="button secondary small-btn">Zurück zur Webseite</a>
       <div class="header-notification-menu" id="headerNotificationMenu">
@@ -125,13 +128,14 @@
 
   <section class="dashboard-app hidden" id="dashboardApp">
     <div class="dashboard-layout">
-      <aside class="dashboard-sidebar card">
-        <button class="side-tab active" data-tab="overview">Übersicht</button>
-        <button class="side-tab" data-tab="calendar">Kalender</button>
-        <button class="side-tab admin-only" data-tab="tasks">Aufgaben</button>
-        <button class="side-tab" data-tab="appointments">Termine</button>
-        <button class="side-tab admin-only" data-tab="customers">Kunden</button>
-        <button class="side-tab admin-only" data-tab="settings">Einstellungen</button>
+      <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+      <aside class="dashboard-sidebar card" id="dashboardSidebar" role="navigation" aria-label="Dashboard Navigation">
+        <button class="side-tab active" data-tab="overview" aria-label="Übersicht anzeigen">Übersicht</button>
+        <button class="side-tab" data-tab="calendar" aria-label="Kalender anzeigen">Kalender</button>
+        <button class="side-tab admin-only" data-tab="tasks" aria-label="Aufgaben anzeigen">Aufgaben</button>
+        <button class="side-tab" data-tab="appointments" aria-label="Termine anzeigen">Termine</button>
+        <button class="side-tab admin-only" data-tab="customers" aria-label="Kunden anzeigen">Kunden</button>
+        <button class="side-tab admin-only" data-tab="settings" aria-label="Einstellungen anzeigen">Einstellungen</button>
       </aside>
 
       <div class="dashboard-content">
